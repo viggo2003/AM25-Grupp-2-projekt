@@ -3,13 +3,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.util.Random;
+import java.awt.event.ActionEvent;
 
 public class Start {
     JFrame frame = new JFrame("Jumpy Birb");
     JPanel panel = new JPanel();
 
     public Start() {
-        
+
         int width = 800, height = 600;
         int birdY = height / 2, birdX = 200, velocity = 0, gravity = 2;
 
@@ -17,7 +19,14 @@ public class Start {
         frame.setSize(800, 600);
 
         JButton button = new JButton("Start");
-        button.addActionListener(e -> System.out.println("Button clicked!"));
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGame(panel);
+
+            }
+        });
 
         panel.add(button); // Knapp för interaktion
         button.setBounds(width / 2 - 75, height / 2 + 20, 150, 50);
@@ -33,7 +42,20 @@ public class Start {
 
     }
 
+    public static void startGame(JPanel panel) {
+       
+        panel.removeAll();
+        panel.revalidate();
+        panel.repaint();
+        panel.setBackground(new Color(200));
+     
+     
+       
+        
+
+    }
+
     public static void main(String[] args) {
-        new Startgame();
+        new Start();
     }
 }
