@@ -1,4 +1,6 @@
 import javax.swing.*;
+
+import java.awt.Color;
 import java.awt.event.*;
 
 public class Button implements ActionListener, KeyListener {
@@ -33,6 +35,12 @@ public class Button implements ActionListener, KeyListener {
 
             panel.requestFocusInWindow();
         }
+
+            panel.removeAll();
+            panel.revalidate();
+            panel.repaint();
+            panel.setBackground(new Color(200));
+        
     }
 
     @Override
@@ -47,4 +55,12 @@ public class Button implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {}
+
+    public static void startGame(JPanel panel) {
+
+        panel.removeAll();
+        panel.revalidate();
+        panel.repaint();
+        panel.setBackground(new Color(200));
+    }
 }
