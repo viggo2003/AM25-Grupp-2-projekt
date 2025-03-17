@@ -13,7 +13,10 @@ public class Button implements ActionListener, KeyListener {
         this.frame = frame;
         this.panel = panel;
 
+        // Skapa knappen innan den används
         button = new JButton("Start");
+        
+        // Ställ in egenskaper för knappen
         button.setBounds(width / 2 - 75, height / 2 + 20, 150, 50);
         button.addActionListener(this);
 
@@ -27,6 +30,8 @@ public class Button implements ActionListener, KeyListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
             System.out.println("Startknappen klickades!");
+
+            panel.requestFocusInWindow();
         }
     }
 
