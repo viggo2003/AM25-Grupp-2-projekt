@@ -35,7 +35,6 @@ public class Button implements ActionListener, KeyListener {
 
             panel.requestFocusInWindow();
         }
-
             panel.removeAll();
             panel.revalidate();
             panel.repaint();
