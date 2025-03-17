@@ -1,4 +1,3 @@
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -13,8 +12,7 @@ public class Start {
     public Start() {
 
         int width = 800, height = 600;
-        int birdY = height / 2, birdX = 200, velocity = 0, gravity = 2;
-
+        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
@@ -56,6 +54,7 @@ public class Start {
     }
 
     public static void main(String[] args) {
+        new Start();
         new Start();
     }
 }
