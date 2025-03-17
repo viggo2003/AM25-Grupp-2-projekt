@@ -1,0 +1,6 @@
+# Ignorera kompilerade Java-filer
+*.class
+
+# Ignorera IDE-filer (om du använder VS Code)
+.vscode/
+.idea/
