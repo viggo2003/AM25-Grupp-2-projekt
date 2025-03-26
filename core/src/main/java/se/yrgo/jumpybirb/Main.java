@@ -1,10 +1,14 @@
 package se.yrgo.jumpybirb;
 
+import java.math.BigDecimal;
+import java.nio.BufferOverflowException;
+
 import javax.swing.text.FieldView;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -16,10 +20,13 @@ public class Main implements ApplicationListener {
     FitViewport viewport;
     SpriteBatch spriteBatch; 
 
+    Birb birb; 
+
     @Override
     public void create() {
+        
         backgroundTexture = new Texture("assets\\background.jpg");
-        viewport = new FitViewport(8, 5);
+        viewport = new FitViewport(5, 5);
         spriteBatch = new SpriteBatch(); 
         
     }
