@@ -86,23 +86,19 @@ public class Main implements ApplicationListener {
     public void input(){
         float jumpHeight = 100f;
         float delta = Gdx.graphics.getDeltaTime();
-        try{
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             birbSprite.translateY(jumpHeight * delta);
-            wait(33);
+
 
         }else{
             birbSprite.translateY(-8f * delta);
 
         }
-    } catch(InterruptedException ex){
-        ex.getMessage();
-    }
 
     }
 
     public void logic(){
-     
+
     }
 
     @Override
