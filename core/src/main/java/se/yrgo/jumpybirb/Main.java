@@ -16,21 +16,28 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
 public class Main implements ApplicationListener {
 
-    Texture backgroundTexture; 
+    Texture backgroundTexture;
     FitViewport viewport;
-    SpriteBatch spriteBatch; 
-    
-    Texture birbTexture; 
+    SpriteBatch spriteBatch;
+
+    Texture birbTexture;
     Sprite birbSprite;
-    Birb birb; 
-    
+    Birb birb;
+
+    float velocityY = 0;
+    float gravity = -180f;
+    float jumpForce = 50f;
+    float maxYVelocity = 100f;
 
     @Override
     public void create() {
-        
+
         birbTexture = new Texture("assets\\bird.png");
         birbSprite = new Sprite(birbTexture);
         birbSprite.setSize(10, 10);
@@ -39,8 +46,8 @@ public class Main implements ApplicationListener {
         birb = new Birb(birbTexture, birbSprite);
         backgroundTexture = new Texture("assets\\background.jpg");
         viewport = new FitViewport(75, 50);
-        spriteBatch = new SpriteBatch(); 
-        
+        spriteBatch = new SpriteBatch();
+
     }
 
     @Override
@@ -51,53 +58,48 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        input();
+        input(Gdx.graphics.getDeltaTime());
         draw();
-        logic(); 
+        logic();
     }
 
-    public void draw(){
-        ScreenUtils.clear(Color.BLACK); 
+    public void draw() {
+        ScreenUtils.clear(Color.BLACK);
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-
-        
         float width = viewport.getWorldWidth();
         float height = viewport.getWorldHeight();
-     
-       
 
         spriteBatch.draw(backgroundTexture, 0, 0, width, height);
         birbSprite.draw(spriteBatch);
-        //birbSprite.
-        
-
-       
-   
-        
+        // birbSprite.
 
         spriteBatch.end();
-
-
     }
 
-    public void input(){
-        float jumpHeight = 100f;
-        float delta = Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            birbSprite.translateY(jumpHeight * delta);
+    public void input(float delta) {
 
-
-        }else{
-            birbSprite.translateY(-8f * delta);
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            velocityY = jumpForce;
         }
 
+        velocityY += gravity * delta;
+
+        if (velocityY > maxYVelocity) {
+            velocityY = maxYVelocity;
+        }
+
+        birbSprite.translateY(velocityY * delta);
+
+        if (birbSprite.getY() < 0) {
+            birbSprite.setY(0);
+            velocityY = 0;
+        }
     }
 
-    public void logic(){
+    public void logic() {
 
     }
 
