@@ -38,7 +38,6 @@ public class Main implements ApplicationListener {
 
     @Override
     public void create() {
-
         birbTexture = new Texture("bird.png");
         birbSprite = new Sprite(birbTexture);
         birbSprite.setSize(10, 10);
@@ -47,7 +46,12 @@ public class Main implements ApplicationListener {
         birb = new Birb(birbTexture, birbSprite);
 
         backgroundTexture = new Texture("background.jpg");
-        viewport = new FitViewport(75, 50);
+
+        float aspect = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+        float worldHeight = 50f;
+        float worldWidth = worldHeight * aspect;
+        viewport = new FitViewport(worldWidth, worldHeight);
+
         spriteBatch = new SpriteBatch();
 
         obstacles = new Obstacles[OBSTACLE_COUNT];
@@ -55,7 +59,6 @@ public class Main implements ApplicationListener {
             float x = 60 + i * (OBSTACLE_SPACING + Obstacles.TUBE_WIDTH);
             obstacles[i] = new Obstacles(x);
         }
-
     }
 
     @Override
@@ -111,7 +114,7 @@ public class Main implements ApplicationListener {
 
     public void input(float delta) {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isTouched()) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.justTouched()) {
             velocityY = jumpForce;
         }
 
@@ -123,8 +126,15 @@ public class Main implements ApplicationListener {
 
         birbSprite.translateY(velocityY * delta);
 
-        if (birbSprite.getY() < 0) {
-            birbSprite.setY(0);
+        // temporärt tak
+        if (birbSprite.getY() > viewport.getWorldHeight()) {
+            velocityY = 0;
+            birbSprite.setY(viewport.getWorldHeight() - 3);
+        }
+
+        // en faktiskt mark
+        if (birbSprite.getY() < 4) {
+            birbSprite.setY(4);
             velocityY = 0;
         }
     }
@@ -145,7 +155,7 @@ public class Main implements ApplicationListener {
             }
         }
 
-        if (birbSprite.getY() < 10) {
+        if (birbSprite.getY() < 5) {
             System.out.println("game over rip");
         }
 
@@ -170,4 +180,4 @@ public class Main implements ApplicationListener {
             obs.dispose();
         }
     }
-} 
+}
