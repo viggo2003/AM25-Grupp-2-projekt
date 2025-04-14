@@ -16,9 +16,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  */
 public class Main implements ApplicationListener {
 
+<<<<<<< HEAD
     private static final int OBSTACLE_SPACING = 40;
     private static final int OBSTACLE_COUNT = 3;
 
+=======
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
     Texture backgroundTexture;
     FitViewport viewport;
     SpriteBatch spriteBatch;
@@ -27,12 +30,23 @@ public class Main implements ApplicationListener {
     Sprite birbSprite;
     Birb birb;
 
+<<<<<<< HEAD
     Obstacles[] obstacles;
+=======
+    float velocityY = 0;
+    float gravity = -180f;
+    float jumpForce = 50f;
+    float maxYVelocity = 100f;
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
 
     @Override
     public void create() {
 
+<<<<<<< HEAD
         birbTexture = new Texture("bird.png");
+=======
+        birbTexture = new Texture("assets\\bird.png");
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
         birbSprite = new Sprite(birbTexture);
         birbSprite.setSize(10, 10);
         birbSprite.setCenterY(25);
@@ -43,12 +57,15 @@ public class Main implements ApplicationListener {
         viewport = new FitViewport(75, 50);
         spriteBatch = new SpriteBatch();
 
+<<<<<<< HEAD
         obstacles = new Obstacles[OBSTACLE_COUNT];
         for (int i = 0; i < OBSTACLE_COUNT; i++) {
             float x = 60 + i * (OBSTACLE_SPACING + Obstacles.TUBE_WIDTH);
             obstacles[i] = new Obstacles(x);
         }
 
+=======
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
     }
 
     @Override
@@ -59,9 +76,15 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
+<<<<<<< HEAD
         input();
         logic();
         draw();
+=======
+        input(Gdx.graphics.getDeltaTime());
+        draw();
+        logic();
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
     }
 
     public void draw() {
@@ -75,6 +98,7 @@ public class Main implements ApplicationListener {
 
         spriteBatch.draw(backgroundTexture, 0, 0, width, height);
         birbSprite.draw(spriteBatch);
+<<<<<<< HEAD
 
         for (Obstacles obs : obstacles) {
             System.out.println(obs.getPosTopTube());
@@ -94,12 +118,35 @@ public class Main implements ApplicationListener {
 
         } else {
             birbSprite.translateY(-8f * delta);
+=======
+        // birbSprite.
 
+        spriteBatch.end();
+    }
+
+    public void input(float delta) {
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            velocityY = jumpForce;
         }
 
+        velocityY += gravity * delta;
+
+        if (velocityY > maxYVelocity) {
+            velocityY = maxYVelocity;
+        }
+
+        birbSprite.translateY(velocityY * delta);
+
+        if (birbSprite.getY() < 0) {
+            birbSprite.setY(0);
+            velocityY = 0;
+        }
     }
 
     public void logic() {
+<<<<<<< HEAD
         for (Obstacles obs : obstacles) {
             obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
             obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
@@ -113,6 +160,8 @@ public class Main implements ApplicationListener {
                 // TODO: Stoppa spelet eller visa meny
             }
         }
+=======
+>>>>>>> fa5d859c7c97897650451992c4e173230d8e8e28
 
     }
 
