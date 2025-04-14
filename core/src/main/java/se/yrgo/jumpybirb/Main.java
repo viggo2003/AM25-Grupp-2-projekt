@@ -17,7 +17,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Main implements ApplicationListener {
 
     private static final int OBSTACLE_SPACING = 40;
-    private static final int OBSTACLE_COUNT = 3;
+    private static final int OBSTACLE_COUNT = 2;
+    private static final float OBSTACLE_SPEED = 20f;
 
     Texture backgroundTexture;
     FitViewport viewport;
@@ -28,6 +29,8 @@ public class Main implements ApplicationListener {
     Birb birb;
 
     Obstacles[] obstacles;
+    Texture obstaclesTexture;
+
     float velocityY = 0;
     float gravity = -180f;
     float jumpForce = 50f;
@@ -79,6 +82,28 @@ public class Main implements ApplicationListener {
 
         spriteBatch.draw(backgroundTexture, 0, 0, width, height);
         birbSprite.draw(spriteBatch);
+
+        float tubeWidth = 10; // justera efter smak
+        float tubeHeight = 20; // justera efter din värld
+
+        for (Obstacles obs : obstacles) {
+            // ÖVRE RÖRET - ritas från toppen och FLIPPAS
+            spriteBatch.draw(
+                    obs.getTopTube(),
+                    obs.getPosTopTube().x,
+                    obs.getPosTopTube().y + tubeHeight, // justera för flip
+                    tubeWidth,
+                    -tubeHeight);
+
+            // UNDRE RÖRET - normalt
+            spriteBatch.draw(
+                    obs.getBottomTube(),
+                    obs.getPosBottomTube().x,
+                    obs.getPosBottomTube().y,
+                    tubeWidth,
+                    tubeHeight);
+        }
+
         // birbSprite.
 
         spriteBatch.end();
@@ -86,7 +111,7 @@ public class Main implements ApplicationListener {
 
     public void input(float delta) {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isTouched()) {
             velocityY = jumpForce;
         }
 
@@ -106,6 +131,7 @@ public class Main implements ApplicationListener {
 
     public void logic() {
         for (Obstacles obs : obstacles) {
+
             obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
             obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
 
@@ -117,6 +143,10 @@ public class Main implements ApplicationListener {
                 System.out.println("\uD83D\uDCA5 Kollision! Game Over");
                 // TODO: Stoppa spelet eller visa meny
             }
+        }
+
+        if (birbSprite.getY() < 10) {
+            System.out.println("game over rip");
         }
 
     }
@@ -140,4 +170,4 @@ public class Main implements ApplicationListener {
             obs.dispose();
         }
     }
-}
+} 
