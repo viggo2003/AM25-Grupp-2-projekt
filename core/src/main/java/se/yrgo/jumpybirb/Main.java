@@ -1,11 +1,5 @@
 package se.yrgo.jumpybirb;
 
-import java.math.BigDecimal;
-import java.nio.BufferOverflowException;
-
-import javax.swing.text.FieldView;
-import javax.swing.text.Position;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -16,31 +10,55 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
 public class Main implements ApplicationListener {
 
-    Texture backgroundTexture; 
+    private static final int OBSTACLE_SPACING = 40;
+    private static final int OBSTACLE_COUNT = 2;
+    private static final float OBSTACLE_SPEED = 20f;
+
+    Texture backgroundTexture;
     FitViewport viewport;
-    SpriteBatch spriteBatch; 
-    
-    Texture birbTexture; 
+    SpriteBatch spriteBatch;
+
+    Texture birbTexture;
     Sprite birbSprite;
-    Birb birb; 
-    
+    Birb birb;
+
+    Obstacles[] obstacles;
+    Texture obstaclesTexture;
+
+    float velocityY = 0;
+    float gravity = -180f;
+    float jumpForce = 50f;
+    float maxYVelocity = 100f;
 
     @Override
     public void create() {
-        
-        birbTexture = new Texture("assets\\bird.png");
+        birbTexture = new Texture("bird.png");
         birbSprite = new Sprite(birbTexture);
         birbSprite.setSize(10, 10);
         birbSprite.setCenterY(25);
         birbSprite.setCenterX(25);
         birb = new Birb(birbTexture, birbSprite);
-        backgroundTexture = new Texture("assets\\background.jpg");
-        viewport = new FitViewport(75, 50);
-        spriteBatch = new SpriteBatch(); 
-        
+
+        backgroundTexture = new Texture("background.jpg");
+
+        float aspect = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+        float worldHeight = 50f;
+        float worldWidth = worldHeight * aspect;
+        viewport = new FitViewport(worldWidth, worldHeight);
+
+        spriteBatch = new SpriteBatch();
+
+        obstacles = new Obstacles[OBSTACLE_COUNT];
+        for (int i = 0; i < OBSTACLE_COUNT; i++) {
+            float x = 60 + i * (OBSTACLE_SPACING + Obstacles.TUBE_WIDTH);
+            obstacles[i] = new Obstacles(x);
+        }
     }
 
     @Override
@@ -51,57 +69,95 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        input();
+        input(Gdx.graphics.getDeltaTime());
         draw();
-        logic(); 
+        logic();
     }
 
-    public void draw(){
-        ScreenUtils.clear(Color.BLACK); 
+    public void draw() {
+        ScreenUtils.clear(Color.BLACK);
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-
-        
         float width = viewport.getWorldWidth();
         float height = viewport.getWorldHeight();
-     
-       
 
         spriteBatch.draw(backgroundTexture, 0, 0, width, height);
         birbSprite.draw(spriteBatch);
-        //birbSprite.
-        
 
-       
-   
-        
+        float tubeWidth = 10; // justera efter smak
+        float tubeHeight = 20; // justera efter din värld
+
+        for (Obstacles obs : obstacles) {
+            // ÖVRE RÖRET - ritas från toppen och FLIPPAS
+            spriteBatch.draw(
+                    obs.getTopTube(),
+                    obs.getPosTopTube().x,
+                    obs.getPosTopTube().y + tubeHeight, // justera för flip
+                    tubeWidth,
+                    -tubeHeight);
+
+            // UNDRE RÖRET - normalt
+            spriteBatch.draw(
+                    obs.getBottomTube(),
+                    obs.getPosBottomTube().x,
+                    obs.getPosBottomTube().y,
+                    tubeWidth,
+                    tubeHeight);
+        }
+
+        // birbSprite.
 
         spriteBatch.end();
-
-
     }
 
-    public void input(){
-        float jumpHeight = 100f;
-        float delta = Gdx.graphics.getDeltaTime();
-        try{
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            birbSprite.translateY(jumpHeight * delta);
-            wait(33);
+    public void input(float delta) {
 
-        }else{
-            birbSprite.translateY(-8f * delta);
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.justTouched()) {
+            velocityY = jumpForce;
         }
-    } catch(InterruptedException ex){
-        ex.getMessage();
+
+        velocityY += gravity * delta;
+
+        if (velocityY > maxYVelocity) {
+            velocityY = maxYVelocity;
+        }
+
+        birbSprite.translateY(velocityY * delta);
+
+        // temporärt tak
+        if (birbSprite.getY() > viewport.getWorldHeight()) {
+            velocityY = 0;
+            birbSprite.setY(viewport.getWorldHeight() - 3);
+        }
+
+        // en faktiskt mark
+        if (birbSprite.getY() < 4) {
+            birbSprite.setY(4);
+            velocityY = 0;
+        }
     }
 
-    }
+    public void logic() {
+        for (Obstacles obs : obstacles) {
 
-    public void logic(){
+            obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
+
+            if (obs.getPosTopTube().x + Obstacles.TUBE_WIDTH < 0) {
+                obs.reposition(viewport.getWorldWidth() + Obstacles.TUBE_WIDTH);
+            }
+
+            if (obs.collides(birbSprite.getBoundingRectangle())) {
+                System.out.println("\uD83D\uDCA5 Kollision! Game Over");
+                // TODO: Stoppa spelet eller visa meny
+            }
+        }
+
+        if (birbSprite.getY() < 5) {
+            System.out.println("game over rip");
+        }
 
     }
 
@@ -117,6 +173,11 @@ public class Main implements ApplicationListener {
 
     @Override
     public void dispose() {
-        // Destroy application's resources here.
+        backgroundTexture.dispose();
+        birbTexture.dispose();
+        spriteBatch.dispose();
+        for (Obstacles obs : obstacles) {
+            obs.dispose();
+        }
     }
 }
