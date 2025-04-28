@@ -145,7 +145,7 @@ public class Main implements ApplicationListener {
 
             spriteBatch.end();
         }
-    }
+    
 
     public void input(float delta) {
 
