@@ -143,8 +143,9 @@ public class Main implements ApplicationListener {
         }
         // birbSprite.
 
-        spriteBatch.end();
-    }
+            spriteBatch.end();
+        }
+    
 
     public void input(float delta) {
 
