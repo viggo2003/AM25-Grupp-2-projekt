@@ -3,6 +3,7 @@ package se.yrgo.jumpybirb;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -61,6 +62,12 @@ public class Obstacles {
     
 
     public boolean collides(Rectangle player) {
+        boolean topCollision = player.overlaps(boundsTop);
+        boolean bottomCollision = player.overlaps(boundsBottom);
+        
+        if (topCollision || bottomCollision) {
+            System.out.println("aaaaa");
+        }
         return player.overlaps(boundsTop) || player.overlaps(boundsBottom);
     }
 
@@ -84,4 +91,6 @@ public class Obstacles {
         topTube.dispose();
         bottomTube.dispose();
     }
+
+    
 }

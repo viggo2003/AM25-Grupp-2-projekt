@@ -174,12 +174,18 @@ public class Main implements ApplicationListener {
     }
 
     public void logic() {
+
+        if (isGameOver) {
+            return;
+        }
+
+        
         for (Obstacles obs : obstacles) {
 
-            // obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
-            // obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
-            obs.updateX(Gdx.graphics.getDeltaTime());
-
+         
+             obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
+             obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            
             if (obs.getPosTopTube().x + Obstacles.TUBE_WIDTH < 0) {
                 obs.reposition(viewport.getWorldWidth() + Obstacles.TUBE_WIDTH);
             }
