@@ -19,6 +19,8 @@ public class Main implements ApplicationListener {
     private static final int OBSTACLE_SPACING = 40;
     private static final int OBSTACLE_COUNT = 2;
     private static final float OBSTACLE_SPEED = 20f;
+    private boolean isGameOver = false;
+
 
     Texture backgroundTexture;
     FitViewport viewport;
@@ -69,9 +71,21 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        input(Gdx.graphics.getDeltaTime());
+      //  input(Gdx.graphics.getDeltaTime());
+      //  draw();
+      //  logic();
+        if (!isGameOver){
+            input(Gdx.graphics.getDeltaTime());
+            logic();
+        }
         draw();
-        logic();
+
+        if (isGameOver) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                restart();
+            }
+        }
+
     }
 
     public void draw() {
@@ -142,8 +156,9 @@ public class Main implements ApplicationListener {
     public void logic() {
         for (Obstacles obs : obstacles) {
 
-            obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
-            obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            //obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            //obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            obs.updateX(Gdx.graphics.getDeltaTime());
 
             if (obs.getPosTopTube().x + Obstacles.TUBE_WIDTH < 0) {
                 obs.reposition(viewport.getWorldWidth() + Obstacles.TUBE_WIDTH);
@@ -151,14 +166,26 @@ public class Main implements ApplicationListener {
 
             if (obs.collides(birbSprite.getBoundingRectangle())) {
                 System.out.println("\uD83D\uDCA5 Kollision! Game Over");
-                // TODO: Stoppa spelet eller visa meny
+                isGameOver = true;
             }
         }
 
         if (birbSprite.getY() < 5) {
             System.out.println("game over rip");
+            isGameOver = true;
         }
 
+    }
+
+    public void restart(){
+        birbSprite.setPosition(viewport.getWorldWidth() / 4, viewport.getWorldHeight() / 2);
+        velocityY= 0;
+        isGameOver = false;
+
+        for (int i = 0; i < obstacles.length; i++) {
+            float x = 60 + i * (OBSTACLE_SPACING + obstacles.length);
+            obstacles[i].reposition(x);
+        }
     }
 
     @Override
@@ -168,7 +195,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resume() {
-        // Invoked when your application is resumed after pause.
+        
     }
 
     @Override
