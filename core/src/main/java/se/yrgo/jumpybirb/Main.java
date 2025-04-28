@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -21,10 +23,11 @@ public class Main implements ApplicationListener {
     private static final float OBSTACLE_SPEED = 20f;
     private boolean isGameOver = false;
 
-
     Texture backgroundTexture;
     FitViewport viewport;
     SpriteBatch spriteBatch;
+    BitmapFont font;
+    GlyphLayout layout;
 
     Texture birbTexture;
     Sprite birbSprite;
@@ -46,6 +49,11 @@ public class Main implements ApplicationListener {
         birbSprite.setCenterY(25);
         birbSprite.setCenterX(25);
         birb = new Birb(birbTexture, birbSprite);
+
+        font = new BitmapFont();
+        font.setColor(Color.DARK_GRAY);
+        font.getData().setScale(0.5f);
+        layout = new GlyphLayout();
 
         backgroundTexture = new Texture("background.jpg");
 
@@ -71,10 +79,10 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-      //  input(Gdx.graphics.getDeltaTime());
-      //  draw();
-      //  logic();
-        if (!isGameOver){
+        // input(Gdx.graphics.getDeltaTime());
+        // draw();
+        // logic();
+        if (!isGameOver) {
             input(Gdx.graphics.getDeltaTime());
             logic();
         }
@@ -121,6 +129,18 @@ public class Main implements ApplicationListener {
                     tubeHeight);
         }
 
+        if (isGameOver) {
+            String gameOverText = "GAME OVER\nPress R to Restart";
+            layout.setText(font, gameOverText);
+            float textWidth = layout.width;
+            float textHeight = layout.height;
+
+            font.draw(
+                    spriteBatch,
+                    gameOverText,
+                    (viewport.getWorldWidth() - textWidth) / 2,
+                    (viewport.getWorldHeight() + textHeight) / 2);
+        }
         // birbSprite.
 
         spriteBatch.end();
@@ -156,8 +176,8 @@ public class Main implements ApplicationListener {
     public void logic() {
         for (Obstacles obs : obstacles) {
 
-            //obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
-            //obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            // obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
+            // obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
             obs.updateX(Gdx.graphics.getDeltaTime());
 
             if (obs.getPosTopTube().x + Obstacles.TUBE_WIDTH < 0) {
@@ -177,9 +197,9 @@ public class Main implements ApplicationListener {
 
     }
 
-    public void restart(){
+    public void restart() {
         birbSprite.setPosition(viewport.getWorldWidth() / 4, viewport.getWorldHeight() / 2);
-        velocityY= 0;
+        velocityY = 0;
         isGameOver = false;
 
         for (int i = 0; i < obstacles.length; i++) {
@@ -195,7 +215,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resume() {
-        
+
     }
 
     @Override
@@ -203,6 +223,7 @@ public class Main implements ApplicationListener {
         backgroundTexture.dispose();
         birbTexture.dispose();
         spriteBatch.dispose();
+        font.dispose();
         for (Obstacles obs : obstacles) {
             obs.dispose();
         }
