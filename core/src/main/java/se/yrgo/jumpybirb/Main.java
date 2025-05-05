@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
@@ -22,6 +24,7 @@ public class Main implements ApplicationListener {
     private static final int OBSTACLE_COUNT = 2;
     private static final float OBSTACLE_SPEED = 20f;
     private boolean isGameOver = false;
+    private Rectangle birbHitbox;
 
     Texture backgroundTexture;
     FitViewport viewport;
@@ -41,6 +44,9 @@ public class Main implements ApplicationListener {
     float jumpForce = 50f;
     float maxYVelocity = 100f;
 
+    // Add ShapeRenderer for drawing hitboxes
+    private ShapeRenderer shapeRenderer;
+
     @Override
     public void create() {
         birbTexture = new Texture("bird.png");
@@ -49,6 +55,8 @@ public class Main implements ApplicationListener {
         birbSprite.setCenterY(25);
         birbSprite.setCenterX(25);
         birb = new Birb(birbTexture, birbSprite);
+        birbHitbox = new Rectangle();
+        updateBirbHitbox();
 
         font = new BitmapFont();
         font.setColor(Color.DARK_GRAY);
@@ -64,6 +72,9 @@ public class Main implements ApplicationListener {
 
         spriteBatch = new SpriteBatch();
 
+        // Initialize ShapeRenderer
+        shapeRenderer = new ShapeRenderer();
+
         obstacles = new Obstacles[OBSTACLE_COUNT];
         for (int i = 0; i < OBSTACLE_COUNT; i++) {
             float x = 60 + i * (OBSTACLE_SPACING + Obstacles.TUBE_WIDTH);
@@ -73,15 +84,11 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        // Resize your application here. The parameters represent the new window size.
         viewport.update(width, height, true);
     }
 
     @Override
     public void render() {
-        // input(Gdx.graphics.getDeltaTime());
-        // draw();
-        // logic();
         if (!isGameOver) {
             input(Gdx.graphics.getDeltaTime());
             logic();
@@ -108,19 +115,17 @@ public class Main implements ApplicationListener {
         spriteBatch.draw(backgroundTexture, 0, 0, width, height);
         birbSprite.draw(spriteBatch);
 
-        float tubeWidth = 10; // justera efter smak
-        float tubeHeight = 20; // justera efter din värld
+        float tubeWidth = 10; 
+        float tubeHeight = 20;
 
         for (Obstacles obs : obstacles) {
-            // ÖVRE RÖRET - ritas från toppen och FLIPPAS
             spriteBatch.draw(
                     obs.getTopTube(),
                     obs.getPosTopTube().x,
-                    obs.getPosTopTube().y + tubeHeight, // justera för flip
+                    obs.getPosTopTube().y + tubeHeight,
                     tubeWidth,
                     -tubeHeight);
 
-            // UNDRE RÖRET - normalt
             spriteBatch.draw(
                     obs.getBottomTube(),
                     obs.getPosBottomTube().x,
@@ -141,14 +146,29 @@ public class Main implements ApplicationListener {
                     (viewport.getWorldWidth() - textWidth) / 2,
                     (viewport.getWorldHeight() + textHeight) / 2);
         }
-        // birbSprite.
 
-            spriteBatch.end();
+        spriteBatch.end();
+
+        // Draw hitboxes on top using ShapeRenderer
+        shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+
+        // Draw birb's hitbox for reference
+        Rectangle birbBounds = birbSprite.getBoundingRectangle();
+        shapeRenderer.rect(birbHitbox.x, birbHitbox.y, birbHitbox.width, birbHitbox.height);
+        // Draw obstacles hitboxes
+        for (Obstacles obs : obstacles) {
+            Rectangle topBounds = obs.getBoundsTop();
+            Rectangle bottomBounds = obs.getBoundsBottom();
+            shapeRenderer.rect(topBounds.x, topBounds.y, topBounds.width, topBounds.height);
+            shapeRenderer.rect(bottomBounds.x, bottomBounds.y, bottomBounds.width, bottomBounds.height);
         }
-    
+
+        shapeRenderer.end();
+    }
 
     public void input(float delta) {
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.justTouched()) {
             velocityY = jumpForce;
         }
@@ -161,13 +181,11 @@ public class Main implements ApplicationListener {
 
         birbSprite.translateY(velocityY * delta);
 
-        // temporärt tak
         if (birbSprite.getY() > viewport.getWorldHeight()) {
             velocityY = 0;
             birbSprite.setY(viewport.getWorldHeight() - 3);
         }
 
-        // en faktiskt mark
         if (birbSprite.getY() < 4) {
             birbSprite.setY(4);
             velocityY = 0;
@@ -175,18 +193,15 @@ public class Main implements ApplicationListener {
     }
 
     public void logic() {
-
         if (isGameOver) {
             return;
         }
 
-        
-        for (Obstacles obs : obstacles) {
+        updateBirbHitbox();
 
-         
-             obs.getPosTopTube().x -= 20 * Gdx.graphics.getDeltaTime();
-             obs.getPosBottomTube().x -= 20 * Gdx.graphics.getDeltaTime();
-            
+        for (Obstacles obs : obstacles) {
+            obs.updateX(Gdx.graphics.getDeltaTime());
+
             if (obs.getPosTopTube().x + Obstacles.TUBE_WIDTH < 0) {
                 obs.reposition(viewport.getWorldWidth() + Obstacles.TUBE_WIDTH);
             }
@@ -210,19 +225,17 @@ public class Main implements ApplicationListener {
         isGameOver = false;
 
         for (int i = 0; i < obstacles.length; i++) {
-            float x = 60 + i * (OBSTACLE_SPACING + obstacles.length);
+            float x = 60 + i * (OBSTACLE_SPACING + Obstacles.TUBE_WIDTH);
             obstacles[i].reposition(x);
         }
     }
 
     @Override
     public void pause() {
-        // Invoked when your application is paused.
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -231,8 +244,18 @@ public class Main implements ApplicationListener {
         birbTexture.dispose();
         spriteBatch.dispose();
         font.dispose();
+        shapeRenderer.dispose();
         for (Obstacles obs : obstacles) {
             obs.dispose();
         }
+    }
+
+    private void updateBirbHitbox() {
+        float offsetX = 2f; // tweak these offsets and size to shrink or reposition the hitbox
+        float offsetY = 2f;
+        float hitboxWidth = birbSprite.getWidth() - 4f;
+        float hitboxHeight = birbSprite.getHeight() - 4f;
+    
+        birbHitbox.set(birbSprite.getX() + offsetX, birbSprite.getY() + offsetY, hitboxWidth, hitboxHeight);
     }
 }
