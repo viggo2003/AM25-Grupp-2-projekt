@@ -206,7 +206,7 @@ public class Main implements ApplicationListener {
                 obs.reposition(viewport.getWorldWidth() + Obstacles.TUBE_WIDTH);
             }
 
-            if (obs.collides(birbSprite.getBoundingRectangle())) {
+            if (obs.collides(birbHitbox)) {
                 System.out.println("\uD83D\uDCA5 Kollision! Game Over");
                 isGameOver = true;
             }
@@ -255,7 +255,7 @@ public class Main implements ApplicationListener {
         float offsetY = 2f;
         float hitboxWidth = birbSprite.getWidth() - 4f;
         float hitboxHeight = birbSprite.getHeight() - 4f;
-    
+        
         birbHitbox.set(birbSprite.getX() + offsetX, birbSprite.getY() + offsetY, hitboxWidth, hitboxHeight);
     }
 }
