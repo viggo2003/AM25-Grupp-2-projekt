@@ -251,9 +251,9 @@ public class Main implements ApplicationListener {
     }
 
     private void updateBirbHitbox() {
-        float offsetX = 2f; // tweak these offsets and size to shrink or reposition the hitbox
+        float offsetX = 2f; 
         float offsetY = 2f;
-        float hitboxWidth = birbSprite.getWidth() - 4f;
+        float hitboxWidth = birbSprite.getWidth() - 4f; 
         float hitboxHeight = birbSprite.getHeight() - 4f;
         
         birbHitbox.set(birbSprite.getX() + offsetX, birbSprite.getY() + offsetY, hitboxWidth, hitboxHeight);
